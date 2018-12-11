@@ -87,7 +87,9 @@ class MyGame(arcade.Window):
             self.wall_sprite.center_y = 25
             if self.wall_sprite.center_x % 8 == 0:
                 self.wall_list.append(self.wall_sprite)
-                if self.wall_sprite.center_x % 16 == 0:
+                if self.wall_sprite.center_x % 24 == 0:
+                    self.wall_list[0].kill()
+                    self.wall_list[0].kill()
                     self.wall_list[0].kill()
                     self.wall_list[0].kill()
                     self.wall_list[0].kill()
