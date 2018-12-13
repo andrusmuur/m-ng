@@ -1,3 +1,6 @@
+#Pildid võetud lehelt: https://opengameart.org/
+#Osa koodi on võetud lehelt: http://arcade.academy/
+
 import arcade
 import random
 
