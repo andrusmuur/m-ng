@@ -10,6 +10,9 @@ player_speed = 10
 õpetus = 0
 mäng = 1
 mäng_läbi = 2
+
+## Mitu x surnud
+surnud = 0
     
 
 class MyGame(arcade.Window):
@@ -17,32 +20,39 @@ class MyGame(arcade.Window):
     def __init__(self, width, height):
         super().__init__(width, height)
         
-        arcade.set_background_color(arcade.color.BLACK)
+        arcade.set_background_color(arcade.color.BLACK_OLIVE)
         
         self.current_state = õpetus
         self.instructions = []
         
+        
         ## Õpetuse texture
-        õpetused = arcade.load_texture("pildid/õpetus.png")
+        õpetused = arcade.load_texture("pildid/background.png")
         self.instructions.append(õpetused)
        
+    
+        
+    def setup(self):
+        
         self.view_bottom = 0
         self.view_left = 0
         self.score = 0
-        self.game_over = False
         self.score_x = 40
         self.wall_x = 800
         self.last_obstacle_x = 1000
+    
         
-    def setup(self):
-
         self.player_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
         self.obstacle_list = arcade.SpriteList()
         self.coin_list = arcade.SpriteList()
         
         self.player_sprite = arcade.Sprite("pildid/main_character.png", 1)
-        self.player_sprite.center_x = 400
+        
+        if surnud > 0:
+            self.player_sprite.center_x = self.score_x
+        else:
+            self.player_sprite.center_x = 400
         self.player_sprite.center_y = 30
         self.player_list.append(self.player_sprite)
         
@@ -73,20 +83,24 @@ class MyGame(arcade.Window):
     # Game over screen
     def draw_game_over(self):
         output = "Mäng läbi!"
-        arcade.draw_text(output, 240, 400, arcade.color.WHITE, 54)
+        arcade.draw_text(output, self.player_sprite.center_x - 140, 400, arcade.color.WHITE, 54)
         
         output = "Vajuta, et uuesti alustada"
-        arcade.draw_text(output, 310, 300, arcade.color.WHITE, 24)
+        arcade.draw_text(output, self.player_sprite.center_x - 140, 350, arcade.color.WHITE, 24)
+        
+        output = f"Sinu skoor on: {self.score}"
+        arcade.draw_text(output, self.player_sprite.center_x - 140, 300, arcade.color.WHITE, 24)
        
     def draw_game(self):
-        self.player_list.draw()
+        self.player_sprite.draw()
         self.wall_list.draw()
         self.obstacle_list.draw()
         self.coin_list.draw()
         
+        
         # Skoor
         output = f"Score: {self.score}"
-        arcade.draw_text(output, self.score_x, 20, arcade.color.WHITE, 14)
+        arcade.draw_text(output, self.player_sprite.center_x - 30, 20, arcade.color.WHITE, 14)
     
     # Õpetuse screeni joonistamine
     def on_draw(self):
@@ -112,6 +126,7 @@ class MyGame(arcade.Window):
             self.current_state = mäng
         
     def update(self, delta_time):
+        global surnud
         if self.current_state == mäng:
             changed = False
             right_bndry = self.view_left + screen_width - viewport_margin
@@ -165,20 +180,20 @@ class MyGame(arcade.Window):
                 coin.kill()
                 self.score += 1
                 
-            if not self.game_over:
                 self.obstacle_list.update()
                 self.wall_list.update()
                 self.coin_list.update()
             
-            self.score_x += 10
+            self.score_x += player_speed
                 
             if len(arcade.check_for_collision_with_list(self.player_sprite, self.obstacle_list)) > 0:
                 self.current_state = mäng_läbi
+                surnud += 1
                 self.set_mouse_visible(True)
             self.physics_engine.update()
     
     def on_key_press(self, key, modifiers):
-        if key == arcade.key.UP:
+        if key == arcade.key.UP and self.player_sprite.center_y < 94:
             self.player_sprite.change_y = 30
             
     def on_key_release(self, key, modifiers):
